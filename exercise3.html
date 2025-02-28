@@ -10,7 +10,7 @@
         <title>Lab5 - Exercise 1</title>
     </head>
     <body>
-        <input type="text" id="textInput" placeholder="Type something here..."/>
+        <input type="text" id="textInput" placeholder="Enter a user number (1-30)"/>
         <label id="textLabel"></label>
         <button id="redButton">Red</button>
         <button id="blueButton">Blue</button>
@@ -29,9 +29,45 @@
         const orangeButton = document.getElementById('orangeButton');
         const purpleButton = document.getElementById('purpleButton');
     
+
+        const apiUrl = "https://67c2026f61d8935867e51b45.mockapi.io/users_api";
+
+        async function retrieveData(userId) {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data.");
+                }
+
+                const users = await response.json();
+                console.log("Fetched users:", users);
+
+                let userFound = false;
+
+                for (let i = 0; i < users.length; i++) {
+                    if (users[i].id == userId) {
+                        textLabel.textContent = `ID: ${users[i].id}, Name: ${users[i].first_name}, Group: ${users[i].user_group}`;
+                        userFound = true;
+                        break;
+                    }
+                }
+
+                if (!userFound) {
+                    textLabel.textContent = "No users were found with the provided User_ID.";
+                }
+
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                    textLabel.textContent = "Error fetching user data.";
+            }
+        }
+
         textInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-                textLabel.textContent = textInput.value;
+                const userId = textInput.value.trim();
+                if (userId) {
+                    retrieveData(userId);
+                }
                 textInput.value = '';
             }
         });
